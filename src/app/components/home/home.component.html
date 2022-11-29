@@ -1,10 +1,11 @@
 <div class="filters">
     <mat-form-field>
-        <mat-label>Sort</mat-label>
-        <mat-select
+      <mat-label>Sort</mat-label>
+      <mat-select
         panelClass="sort-select"
         [(ngModel)]="sort"
-        >
+        (selectionChange)="searchGames(sort)"
+      >
         <mat-option value="name">Name</mat-option>
         <mat-option value="-released">Released</mat-option>
         <mat-option value="-added">Added</mat-option>
@@ -12,26 +13,38 @@
         <mat-option value="-updated">Updated</mat-option>
         <mat-option value="-rating">Rating</mat-option>
         <mat-option value="metacritic">Metacritic</mat-option>
-
-        </mat-select>
+      </mat-select>
     </mat-form-field>
-</div>
+  </div>
 
-<div class="games">
-    <div class="game">
+  <div class="games">  
+    <ng-container *ngFor="let game of games">
+      <div class="game" (click)="openGameDetails(game.id)">
         <div class="game-thumb-container">
-            <img 
-                src="https://images.hdqwalls.com/wallpapers/spiderman-into-the-spider-selfie-4k-94.jpg" 
-                class="game-thumbnail" alt="thumbnail"
-                />
+          <img
+           *ngIf="game.background_image"
+            src="{{ game.background_image }}"
+            alt="thumbnail"
+            class="game-thumbnail"
+          />
+          <img
+          *ngIf="!game.background_image"
+           src="data:image/jpeg;base64,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"
+           alt="thumbnail"
+           class="game-thumbnail"
+         />
         </div>
         <div class="game-description">
-            <p class="game-name">Spider Man</p>
-            <div class="game-platforms">
-                <img class="game-platform"
-                src="https://e7.pngegg.com/pngimages/374/429/png-clipart-sony-playstation-logo-playstation-2-playstation-3-playstation-4-playstation-game-angle-thumbnail.png"
-                alt="slug"/>
-            </div>
+          <p class="game-name">{{ game.name }}</p>
+          <div class="game-platforms">
+            <img
+             *ngFor="let gamePlatform of game.parent_platforms"            
+              class="game-platform"
+              src="assets/images/platforms/{{ gamePlatform.platform.slug }}.svg"
+              alt="{{ gamePlatform.platform.slug }}"
+            />
+          </div>
         </div>
-    </div>
-</div>
+      </div>
+    </ng-container> 
+  </div>
